@@ -18,6 +18,7 @@ import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/pris
 import { Copy, Eye, EyeOff, ExternalLink, Code2, Loader2, BarChart3, GitBranch, Maximize2, Download } from 'lucide-react';
 import { copyToClipboard } from '../../utils/clipboard';
 import { ClaraFileAttachment } from '../../types/clara_assistant_types';
+import CiaAccordionRenderer from './CiaAccordionRenderer';
 
 // Import Chart.js components
 import {
@@ -1191,6 +1192,24 @@ const MessageContentRenderer: React.FC<MessageContentRendererProps> = React.memo
     
     return elements;
   };
+
+  // ========================================================================
+  // SPECIAL FORMAT HANDLING: CIA Accordion
+  // ========================================================================
+  if (processedContent.content.startsWith('__CIA_ACCORDION__')) {
+    try {
+      const jsonStr = processedContent.content.replace('__CIA_ACCORDION__', '');
+      const ciaData = JSON.parse(jsonStr);
+      return (
+        <div className={`cia-accordion-container ${className}`}>
+          <CiaAccordionRenderer data={ciaData} isDark={darkMode} />
+        </div>
+      );
+    } catch (e) {
+      console.error('Failed to parse CIA Accordion data:', e);
+      // Fall back to standard rendering if parsing fails
+    }
+  }
 
   // Render as Markdown with custom image handling
   return (

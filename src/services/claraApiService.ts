@@ -120,7 +120,7 @@ export class ClaraApiService {
       // ── Case 11 : CIA ───────────────────────────────────────────────────
       case "cia":
         console.log("🔀 Router → Case 11 : integration_cia");
-        return "https://j17rkv4c.rpcld.cc/webhook/integration_cia";
+        return "http://localhost:5678/webhook/cia_cours_gemini";
 
       // ── Case 6 : Algorithme ─────────────────────────────────────────────
       case "algorithme":
@@ -598,6 +598,31 @@ export class ClaraApiService {
       return {
         content: "",
         metadata: { error: "Empty response from n8n", format: "error" },
+      };
+    }
+
+    // ========================================================================
+    // FORMAT 5: CIA — Array with "Sous-section" / "Sub-items" structure
+    // ========================================================================
+    if (
+      Array.isArray(result) &&
+      result.length > 0 &&
+      result[0] &&
+      typeof result[0] === "object" &&
+      "Sous-section" in result[0]
+    ) {
+      console.log(
+        '✅ FORMAT 5 DETECTE: Réponse CIA avec "Sous-section" / "Sub-items"',
+      );
+      const content = `__CIA_ACCORDION__${JSON.stringify(result)}`;
+      console.log("🔍 === FIN ANALYSE (FORMAT 5 - CIA Accordion) ===");
+      return {
+        content,
+        metadata: {
+          format: "cia_accordion",
+          timestamp: new Date().toISOString(),
+          totalSections: result.length,
+        },
       };
     }
 
